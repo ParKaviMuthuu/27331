@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamil Poem Rhythm Reader</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 80%;
+            max-width: 500px;
+        }
+        #tamilInput {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        #playButton {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #playButton:hover {
+            background-color: #45a049;
+        }
+        #playButton:active {
+            background-color: #3c903c;
+        }
+        #playButton:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #errorMessage {
+            color: red;
+            font-size: 0.9em;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <input type="text" id="tamilInput" placeholder="Enter Tamil poem here..." oninput="validateInput()">
+    <button id="playButton" disabled onclick="readPoem()">Play</button>
+    <div id="errorMessage"></div>
+</div>
+
+<script>
+    function validateInput() {
+        const tamilInput = document.getElementById('tamilInput');
+        const playButton = document.getElementById('playButton');
+        const errorMessage = document.getElementById('errorMessage');
+        const tamilRegex = /^[\u0B80-\u0BFF\s]*$/;
+        if (tamilInput.value.length > 0 && tamilRegex.test(tamilInput.value)) {
+            playButton.disabled = false;
+            errorMessage.style.display = 'none';
+        } else if (!tamilRegex.test(tamilInput.value)) {
+            errorMessage.textContent = 'Please enter only Tamil characters.';
+            errorMessage.style.display = 'block';
+            playButton.disabled = true;
+        } else {
+            playButton.disabled = true;
+        }
+    }
+
+    function readPoem() {
+        if ('speechSynthesis' in window) {
+            const text = document.getElementById('tamilInput').value;
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = text;
+            msg.lang = 'ta-IN'; // Language set to Tamil - India
+            window.speechSynthesis.speak(msg);
+        } else {
+            alert('Text-to-speech not supported in your browser.');
+        }
+    }
+</script>
+
+</body>
+</html>

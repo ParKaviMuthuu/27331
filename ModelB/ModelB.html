@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tamil Poem Rhythm Player</title>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  .input-field {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+  }
+  .play-button {
+    background-color: #007BFF;
+    color: #FFFFFF;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .play-button:hover {
+    background-color: #0056B3;
+  }
+  .play-button:active {
+    background-color: #003D7F;
+  }
+  .play-button:disabled {
+    background-color: #CCCCCC;
+    cursor: not-allowed;
+  }
+  .error-message {
+    color: red;
+    display: none;
+  }
+</style>
+</head>
+<body>
+  <input type="text" id="poem-input" class="input-field" placeholder="Enter your Tamil poem here">
+  <button id="play-button" class="play-button" disabled>Play</button>
+  <div id="error-message" class="error-message">Only Tamil characters are allowed.</div>
+
+  <script>
+    $(document).ready(function() {
+      const $inputField = $('#poem-input');
+      const $playButton = $('#play-button');
+      const $errorMessage = $('#error-message');
+
+      $inputField.on('input', function() {
+        const userInput = $inputField.val();
+        if (userInput && isTamil(userInput)) {
+          $errorMessage.hide();
+          $playButton.prop('disabled', false);
+        } else {
+          $playButton.prop('disabled', true);
+        }
+      });
+
+      $playButton.on('click', function() {
+        if (window.speechSynthesis) {
+          const utterance = new SpeechSynthesisUtterance($inputField.val());
+          utterance.lang = 'ta-IN';
+          window.speechSynthesis.speak(utterance);
+        }
+      });
+
+      function isTamil(text) {
+        const tamilRegExp = /[\u0B80-\u0BFF]/; // Unicode range for Tamil characters
+        return Array.from(text).every(char => tamilRegExp.test(char));
+      }
+    });
+  </script>
+</body>
+</html>

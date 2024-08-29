@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamil Poem Rhythm Reader</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=2gS6HpiD" type="text/javascript"></script>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e0f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        /* Container Styles */
+        .container {
+            text-align: center;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+        h2 {
+            color: #00796b;
+            margin-bottom: 20px;
+        }
+        /* Input Field Styles */
+        input {
+            padding: 15px;
+            font-size: 18px;
+            border: 1px solid #00796b;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+        input:focus {
+            border-color: #004d40;
+            outline: none;
+        }
+        /* Error Message Styles */
+        .error {
+            color: #d32f2f;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        /* Button Styles */
+        button {
+            padding: 15px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 4px;
+            background-color: #00796b;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        button:disabled {
+            background-color: #b2dfdb;
+            cursor: not-allowed;
+        }
+        button:hover:not(:disabled) {
+            background-color: #004d40;
+        }
+        button:active:not(:disabled) {
+            background-color: #003d33;
+            transform: scale(0.98);
+        }
+        /* Info Message Styles */
+        .info {
+            color: #00796b;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        /* Responsive Styles */
+        @media (max-width: 600px) {
+            input, button {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Tamil Poem Rhythm Reader</h2>
+        <input type="text" id="tamilInput" placeholder="Enter Tamil text here">
+        <div class="error" id="errorMessage"></div>
+        <button id="playButton" disabled>Play</button>
+        <div class="info" id="infoMessage"></div>
+    </div>
+
+    <script>
+        const tamilInput = document.getElementById('tamilInput');
+        const errorMessage = document.getElementById('errorMessage');
+        const playButton = document.getElementById('playButton');
+        const infoMessage = document.getElementById('infoMessage');
+
+        // Tamil Unicode Range: 0B80-0BFF (includes Tamil characters and space)
+        const tamilRegex = /^[\u0B80-\u0BFF\s]*$/;
+
+        function validateInput() {
+            const inputValue = tamilInput.value;
+
+            if (tamilRegex.test(inputValue)) {
+                // Input is valid Tamil characters
+                errorMessage.textContent = '';
+                playButton.disabled = !inputValue.trim();
+            } else {
+                // Input contains invalid characters
+                errorMessage.textContent = 'Please enter only Tamil characters.';
+                // Remove non-Tamil characters and set the input value
+                tamilInput.value = inputValue.replace(/[^\u0B80-\u0BFF\s]/g, '');
+                // Ensure the play button is disabled if the input is invalid
+                playButton.disabled = true;
+            }
+        }
+
+        tamilInput.addEventListener('input', validateInput);
+        tamilInput.addEventListener('paste', (event) => {
+            // Delay validation to allow paste event to complete
+            setTimeout(validateInput, 0);
+        });
+
+        playButton.addEventListener('click', function() {
+            const text = tamilInput.value;
+            if (text) {
+                console.log('Starting speech synthesis...');
+                if (responsiveVoice.voiceSupport()) {
+                    // Use ResponsiveVoice API to read the text aloud
+                    const startTime = Date.now();
+                    responsiveVoice.speak(text, "Tamil Female", {
+                        rate: 1, // Adjust rate for smoother playback
+                        onend: () => {
+                            const endTime = Date.now();
+                            infoMessage.textContent = '';
+                            console.log('Speech ended. Duration:', (endTime - startTime) + 'ms');
+                        },
+                        onerror: (e) => {
+                            infoMessage.textContent = 'Error: ' + e.message;
+                        }
+                    });
+                    infoMessage.textContent = 'Reading aloud...';
+                } else {
+                    infoMessage.textContent = 'Text-to-Speech is not supported in this browser.';
+                }
+            }
+        });
+
+        // Optionally preload voices (if supported by ResponsiveVoice)
+        window.onload = () => {
+            if (responsiveVoice.voiceSupport()) {
+                console.log('Voices available:', responsiveVoice.getVoices());
+            }
+        };
+    </script>
+</body>
+</html>
